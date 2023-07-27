@@ -11,22 +11,20 @@ const   APELLIDO    = 1;
 const   EMAIL       = 2;  
 const   CLAVE       = 3; 
 let listaUsuarios = JSON.parse(localStorage.getItem('listaUsuarios'));
-let usuario = ["registro", "", "", ""];
+let usuario = listaUsuarios[0];
+usuario[0] = "recupero";
 listaUsuarios[0] = usuario // modifica y guarda en local storage
 localStorage.setItem('listaUsuarios', JSON.stringify(listaUsuarios));
 
 var questions = [
-    {question:"¿Cuál es tu mombre?"},
-    {question:"¿Cuál es tu apellido?"},
-    {question:"¿Cuál es tu email?", pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/},
-    {question:"Ingresa una contraseña", type: "password"},
+    {question:"Ingresa tu email de registro", pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/},
+    {question:"Ingresa una nueva contraseña", type: "password"},
     {question:"Repite la contraseña ingresada", type: "password"}
   ]
     
-  const ENTER = 13; // 0Dh carriage return
-  console.log(listaUsuarios[0]);
-  
-  /* Función auto invocada ó "Immediately Invoked Function Expression" o IIFE en inglés. */
+  const ENTER = 13; // 0DH carriage return
+   
+  // ;(function(){  /* Función auto invocada ó "Immediately Invoked Function Expression" o IIFE en inglés. */
   
     var tTime = 100  // transition transform time from #register in ms
     var wTime = 200  // transition width time from #register in ms
@@ -34,8 +32,10 @@ var questions = [
   
     // init
     // --------------
-    var position = 0;
-  
+    let position    = 0;
+    let indiceUser  = usuario[2]; // cargo el índice al que quiere regenerar la clave.
+    let currEmail   = (listaUsuarios[indiceUser])[2]; // leo email para chequear   
+    let nuevaClave  = "";
     putQuestion();
   
     progressButton.addEventListener('click', validate)
@@ -45,8 +45,7 @@ var questions = [
     })
   
     // functions
-    // --------------
-  
+      
     // load the next question
     function putQuestion() {
       inputLabel.innerHTML = questions[position].question
@@ -60,15 +59,15 @@ var questions = [
     function done() {
       // remove the box if there is no next question
       register.className = 'close'
-      // Almacena el nuevo usuario
-      for(let i = 0; i < (questions.length-1);i++){
-        usuario [i] = questions[i].value;
-      }
-      listaUsuarios.push(usuario); // agrega nuevo usuario y guarda en local storage
+      // Almacena la nueva clave
+      usuario = listaUsuarios[indiceUser];
+      usuario[CLAVE] = nuevaClave;
+      listaUsuarios[indiceUser] = usuario;
+      listaUsuarios[0] = ["recupero", "", "", ""];
       localStorage.setItem('listaUsuarios', JSON.stringify(listaUsuarios));
       // add the h2 at the end with the welcome text
       var h2 = document.createElement('h2')
-      h2.appendChild(document.createTextNode('Bienvenido ' + questions[0].value + ', has sido registrado!'))
+      h2.appendChild(document.createTextNode('Felicitaciones ' + usuario[0] + ', Contraseña Recuperada!'))
       setTimeout(function() {
         register.parentElement.appendChild(h2)     
         setTimeout(function() {h2.style.opacity = 1}, 50)
@@ -78,25 +77,42 @@ var questions = [
   
     // when submitting the current question
     function validate() {
-      // set the value of the field into the array
-      questions[position].value = inputField.value
-      // check if the pattern matches
-      if (!inputField.value.match(questions[position].pattern || /.+/)) {wrong()}
-      else if ((questions[position].question == "Repite la contraseña ingresada") && 
-              (questions[position].value != questions[position-1].value)) {
-          wrong();
-          position -= 1;
-          hideCurrent(putQuestion)
+    //check if the pattern matches
+        if (!inputField.value.match(questions[position].pattern || /.+/)) {
+            wrong()
         }
-      else ok(function() {
-        // set the progress of the background
-        progress.style.width = ++position * 100 / questions.length + 'vw'
-        // if there is a new question, hide current and load next
-        if (questions[position]) hideCurrent(putQuestion)
-        else hideCurrent(done)          
-      })
+        switch (position) {
+            case 0:
+                if (currEmail != inputField.value) {
+                    wrong();
+                    hideCurrent(putQuestion)
+                    break;
+                }
+            case 1:
+                nuevaClave = inputField.value;
+                okFunction();
+                break;
+            case 2:
+                if (nuevaClave != inputField.value) {
+                    wrong();
+                    position -= 1;
+                    hideCurrent(putQuestion)
+                    break;
+                }
+                okFunction();    
+            }
     }
     
+    function okFunction () {
+        ok(function() {
+            // set the progress of the background
+            progress.style.width = ++position * 100 / questions.length + 'vw'
+            // if there is a new question, hide current and load next
+            if (questions[position]) hideCurrent(putQuestion)
+            else hideCurrent(done)
+        })  
+    }
+
     // helper
     // --------------
   
@@ -153,7 +169,7 @@ var questions = [
       // remove the box if there is no next question
       register.className = 'close'
       var h2 = document.createElement('h2')
-      h2.appendChild(document.createTextNode('Abandonando Registro de Nuevo Usuario...'))
+      h2.appendChild(document.createTextNode('Abandonando Recupero de Contraseña...'))
       setTimeout(function() {
         register.parentElement.appendChild(h2)     
         setTimeout(function() {h2.style.opacity = 1}, 50)
@@ -161,3 +177,4 @@ var questions = [
       exitRegister(3000);
     }
 
+  // }()) 
