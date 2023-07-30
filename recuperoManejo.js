@@ -1,21 +1,25 @@
 const exitButon   = document.querySelector("#ex-button");
-// ListaUsuarios [0]
+// ListaUsuarios [0] usado como estado y retorno de resultados
 const   RUTINA      = 0;
-const   NOMBRE_OK   = 1;
-const   INDICE      = 2;  
-const   vacante     = 3; 
+const   RESULTADO   = 1;
+const   USER_OK     = 2;  
+const   INDICE      = 3;
+const   vacante     = 4;
 
-// listaUsuarios = ["nombre", "apellido", "email@dom.com", "cantrasenia"]// Recupero el valor de la variable desde localStorage
-const   NOMBRE      = 0;
-const   APELLIDO    = 1;
-const   EMAIL       = 2;  
-const   CLAVE       = 3; 
+// listaUsuarios = ["nombreDeUsuario", "nombre", "apellido", "email@dom.com", "cantrasenia"]// Recupero el valor de la variable desde localStorage
+const   USRNAME     = 0;
+const   NOMBRE      = 1;
+const   APELLIDO    = 2;
+const   EMAIL       = 3;  
+const   CLAVE       = 4; 
 let listaUsuarios = JSON.parse(localStorage.getItem('listaUsuarios'));
 let usuario = listaUsuarios[0];
 usuario[0] = "recupero";
 listaUsuarios[0] = usuario // modifica y guarda en local storage
 localStorage.setItem('listaUsuarios', JSON.stringify(listaUsuarios));
-
+const Q_EMAIL   = 0;
+const Q_CLAVE1  = 1;
+const Q_CLAVE2  = 2;
 var questions = [
     {question:"Ingresa tu email de registro", pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/},
     {question:"Ingresa una nueva contraseña", type: "password"},
@@ -32,9 +36,9 @@ var questions = [
   
     // init
     // --------------
-    let position    = 0;
-    let indiceUser  = usuario[2]; // cargo el índice al que quiere regenerar la clave.
-    let currEmail   = (listaUsuarios[indiceUser])[2]; // leo email para chequear   
+    let position    = Q_EMAIL;
+    let indiceUser  = usuario[INDICE]; // cargo el índice al que quiere regenerar la clave.
+    let currEmail   = (listaUsuarios[indiceUser])[EMAIL]; // leo email para chequear   
     let nuevaClave  = "";
     putQuestion();
   
@@ -63,11 +67,11 @@ var questions = [
       usuario = listaUsuarios[indiceUser];
       usuario[CLAVE] = nuevaClave;
       listaUsuarios[indiceUser] = usuario;
-      listaUsuarios[0] = ["recupero", "", "", ""];
+      listaUsuarios[0] = ["recupero", "", "", "", ""];
       localStorage.setItem('listaUsuarios', JSON.stringify(listaUsuarios));
       // add the h2 at the end with the welcome text
       var h2 = document.createElement('h2')
-      h2.appendChild(document.createTextNode('Felicitaciones ' + usuario[0] + ', Contraseña Recuperada!'))
+      h2.appendChild(document.createTextNode('Felicitaciones ' + usuario[NOMBRE] + ', Contraseña Recuperada!'))
       setTimeout(function() {
         register.parentElement.appendChild(h2)     
         setTimeout(function() {h2.style.opacity = 1}, 50)
@@ -82,17 +86,17 @@ var questions = [
             wrong()
         }
         switch (position) {
-            case 0:
+            case Q_EMAIL:
                 if (currEmail != inputField.value) {
                     wrong();
                     hideCurrent(putQuestion)
                     break;
                 }
-            case 1:
+            case Q_CLAVE1:
                 nuevaClave = inputField.value;
                 okFunction();
                 break;
-            case 2:
+            case Q_CLAVE2:
                 if (nuevaClave != inputField.value) {
                     wrong();
                     position -= 1;

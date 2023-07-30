@@ -4,9 +4,12 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
     justify-content: center;
     height: 100vh;
     margin: 0;
+    background-size: cover;
+    background-position: top; 
 }
 
 .h2-oculto {
@@ -16,7 +19,8 @@ body {
 
 h2 {
     position: relative;
-    color: #fff;
+    color: #03e9f4;
+    font-size: 48px;
     opacity: 0.1;
     transition: 3s ease-in-out;
 }
