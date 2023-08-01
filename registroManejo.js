@@ -1,4 +1,7 @@
+const miBody      = document.querySelector("body");
 const exitButon   = document.querySelector("#ex-button");
+// IMAGEN DE FONDO REGISTRO EXITOSO 
+const IMG_SUCC_REG  = "https://weshineacademy.com/wp-content/uploads/2017/12/ThankyouRegistering-1024x435.png";
 const ENTER = 13; // 0Dh carriage return
 // ListaUsuarios [0]
 const   RUTINA      = 0;
@@ -76,6 +79,7 @@ var questions = [
       listaUsuarios.push(usuario); // agrega nuevo usuario y guarda en local storage
       guardaListaEnLS();
       // add the h2 at the end with the welcome text
+      miBody.style.backgroundImage = `url("${IMG_SUCC_REG}")`;
       var h2 = document.createElement('h2')
       h2.appendChild(document.createTextNode('Bienvenido ' + questions[NOMBRE].value + ', has sido registrado!'))
       setTimeout(function() {
